@@ -4,7 +4,12 @@ import { bech32encode } from "./bech32";
 
 const fetcher = new NostrFetcher();
 const FETCH_COUNT = 300;
-const RELAYS = ["wss://relay-jp.nostr.wirednet.jp"];
+const RELAYS = [
+  "wss://relay.damus.io",
+  "wss://relay.snort.social",
+  "wss://relay-jp.nostr.wirednet.jp",
+  "wss://nostr-relay.nokotaro.com",
+];
 
 interface LikedPost {
   id: string;
