@@ -1,22 +1,40 @@
 <script lang="ts">
   import { store } from "./lib/store";
 
-  let pubkey =
-    "npub133vj8ycevdle0cq8mtgddq0xtn34kxkwxvak983dx0u5vhqnycyqj6tcza";
+  let pubkey = "";
   let selected: string[] = [];
+  let errorMessage = "";
+  let loading = false;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(selected.join("\n"));
+  };
+  const fetch = async () => {
+    try {
+      loading = true;
+      await store.fetch(pubkey);
+      errorMessage = "";
+    } catch {
+      errorMessage = "something went wrong";
+    } finally {
+      loading = false;
+    }
   };
 </script>
 
 <main>
   <div>
-    <input type="text" bind:value={pubkey} placeholder="npub1..." />
-    <button on:click={() => store.fetch(pubkey)}
-      >Fetch recent your liked posts</button
-    >
+    <input
+      type="text"
+      bind:value={pubkey}
+      placeholder="npub1..."
+      on:input={() => (errorMessage = "")}
+    />
+    <button on:click={fetch}>Fetch recent your liked posts</button>
   </div>
+  {#if errorMessage}
+    <small class="error-message">{errorMessage}</small>
+  {/if}
   {#if $store.posts.length > 0}
     <button on:click={copyToClipboard}
       >Copy selected posts' IDs to clipboard</button
@@ -24,6 +42,10 @@
   {/if}
 
   <hr />
+
+  {#if loading && $store.posts.length <= 0}
+    loading...
+  {/if}
 
   {#each $store.posts as post (post.id)}
     <label class:selected={selected.includes(post.id)}>
@@ -59,6 +81,10 @@
 </main>
 
 <style>
+  .error-message {
+    color: red;
+  }
+
   hr {
     margin: 20px 0;
   }
